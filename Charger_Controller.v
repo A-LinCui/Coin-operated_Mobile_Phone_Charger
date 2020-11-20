@@ -82,7 +82,7 @@ module ChargeController(
                     state_timing = 1;
                     storage_reset = 0;
                     timer_reset = 0;
-				    end
+                    end
                 S2:begin
                     no_display = 0;
                     timing = 0;
@@ -96,7 +96,7 @@ module ChargeController(
                     state_timing = 0;
                     storage_reset = 0;
                     timer_reset = 0;
-				    end
+                    end
                 S4:begin
                     no_display = 0;
                     timing = 1;
