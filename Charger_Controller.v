@@ -2,14 +2,13 @@
 // Author: Junbo Zhao <zhaojb17@mails.tsinghua.edu.cn>.
 
 module ChargeController(
-	input clk,
-	input init_reset, //Initial reset signal
+    input clk,
+    input init_reset, //Initial reset signal
     input start, //The signal to move current state from S0 to S1 
     input insert, //The signal that the storage gets a number 
     input reset, //The signal to reset the FSM
     input affirm, //The signal to move current state to S4
     input end_timing, //The signal that the timer stops timing
-    // input [5:0]current_time, //Current left time of timer
     output reg no_display, //The signal to extinguish the digital tubes
     output reg timing, //The siginal to start the charging
     output reg state_timing, //The siginal to start the ten-second counting-down of state S1
