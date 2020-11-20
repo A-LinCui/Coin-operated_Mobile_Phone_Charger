@@ -44,77 +44,72 @@ module ChargeController(
 
 	always @ (posedge clk or posedge init_reset)
 	begin
-		if (init_reset)
-			current_state <= S0;
-		else
-		   current_state <= next_state;
+        if (init_reset) current_state <= S0;
+        else current_state <= next_state;
 	end
 
 	always@(current_state or start or insert or affirm or end_timing or reset)
 	begin
-		if(reset) next_state <= S1;
-		else begin
-			case(current_state)
-				S0: next_state <= start? S1:S0;
-        		S1: 
-            		if(insert)
-                		next_state <= S2;
-            		else if(end_timing)
-                		next_state <= S0;
-            		else
-                		next_state <= S1;
-        		S2: next_state <= insert? S3:S2;
-        		S3: next_state <= affirm? S4:S3;
-        		S4: next_state <= end_timing? S1:S4;
-        endcase
-		end
+        if(reset) next_state <= S1;
+        else begin
+            case(current_state)
+                S0: next_state <= start? S1:S0;
+                S1: 
+                    if(insert) next_state <= S2;
+                    else if(end_timing) next_state <= S0;
+                    else next_state <= S1;
+                S2: next_state <= insert? S3:S2;
+                S3: next_state <= affirm? S4:S3;
+                S4: next_state <= end_timing? S1:S4;
+            endcase
+        end
     end
 
-   always@(current_state or reset)
-	begin
-		if (~reset)
-		begin
-			case(current_state)
-            	S0:begin
-                	no_display = 1;
-                	timing = 0;
-                	state_timing = 0;
-                	storage_reset = 1;
-                	timer_reset = 1;
-				end
-            	S1:begin
-                	no_display = 0;
-                	timing = 0;
-                	state_timing = 1;
-                	storage_reset = 0;
-                	timer_reset = 0;
-				end
-				S2:begin
-                	no_display = 0;
-                	timing = 0;
-                	state_timing = 0;
-                	storage_reset = 0;
-                	timer_reset = 0;
-				end
-            	S3:begin
-                	no_display = 0;
-                	timing = 0;
-                	state_timing = 0;
-                	storage_reset = 0;
-                	timer_reset = 0;
-				end
-            	S4:begin
-                	no_display = 0;
-                	timing = 1;
-                	state_timing = 0;
-                	storage_reset = 0;
-                	timer_reset = 0;
-				end
-        	endcase
-		end
-		else begin
-			storage_reset = 0;
+    always@(current_state or reset)
+    begin
+        if (~reset)
+        begin
+            case(current_state)
+                S0:begin
+                    no_display = 1;
+                    timing = 0;
+                    state_timing = 0;
+                    storage_reset = 1;
+                    timer_reset = 1;
+                    end
+                S1:begin
+                    no_display = 0;
+                    timing = 0;
+                    state_timing = 1;
+                    storage_reset = 0;
+                    timer_reset = 0;
+				    end
+                S2:begin
+                    no_display = 0;
+                    timing = 0;
+                    state_timing = 0;
+                    storage_reset = 0;
+                    timer_reset = 0;
+                    end
+                S3:begin
+                    no_display = 0;
+                    timing = 0;
+                    state_timing = 0;
+                    storage_reset = 0;
+                    timer_reset = 0;
+				    end
+                S4:begin
+                    no_display = 0;
+                    timing = 1;
+                    state_timing = 0;
+                    storage_reset = 0;
+                    timer_reset = 0;
+                    end
+            endcase
+        end
+        else begin
+            storage_reset = 0;
             timer_reset = 0;
-		end
-	end
+            end
+    end
 endmodule
