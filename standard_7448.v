@@ -17,7 +17,7 @@ module standard_7448(
     parameter lighten_all = 7'b1111111, extinguish_all = 7'b0000000;
     always@(data or LT or RBI or BI)
     begin
-        display = 7'b0000000;
+        display = extinguish_all;
         if(~BI)
         begin
             case(data)
