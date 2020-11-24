@@ -33,16 +33,14 @@ module Keyboard(
         begin
             cnt <= 16'b0000000000000000;
             clk_div <= ~clk_div;
-		end
+        end
     end
 
-	always@(posedge clk_div or posedge rst_n)
-	begin
-        if (rst_n)begin
-            current_state <= S0;
-        end
+    always@(posedge clk_div or posedge rst_n)
+    begin
+	if (rst_n) current_state <= S0;
         else current_state <= next_state;
-	end
+    end
 
     always@(current_state or key_value)
     begin
