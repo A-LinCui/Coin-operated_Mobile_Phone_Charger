@@ -28,7 +28,7 @@ module Keyboard(
         begin
             cnt <= cnt + 1'b1;
             clk_div <= clk_div;
-		end
+        end
         else 
         begin
             cnt <= 16'b0000000000000000;
