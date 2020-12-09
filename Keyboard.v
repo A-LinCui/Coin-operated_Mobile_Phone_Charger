@@ -7,7 +7,7 @@ module Keyboard(
     input [3:0]row, //x-axis
     output reg [3:0]col, //y-axis
     output reg [3:0]key_value, //The key value signal passed to the AmountManager
-    output reg press_num, //The signal that a number key is pressed, passed to ChageController
+    output reg press_num, //The signal that a number key is pressed, passed to ChargeController
     output reg start, //The signal that the key "START" is pressed, passed to ChargeController
     output reg clear, //The signal that the key "CLEAR" is pressed, paseed to ChargeController as "RESET"
     output reg confirm //The signal that the key "CONFIRM" is pressed, passed to ChargeController

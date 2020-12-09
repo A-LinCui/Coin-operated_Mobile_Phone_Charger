@@ -14,7 +14,6 @@ wire[6:0] display;
 reg[3:0] iter;
 
 
-// 调用被仿真模块模块 
 Standard_7448 sd_7448(
     .data(data),
     .LT(LT),
