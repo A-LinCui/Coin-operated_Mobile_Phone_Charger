@@ -30,7 +30,7 @@ initial begin
     data = 4'b0000;
 
     // Stage 1: Test the basic function by display from zero to fifteen.
-    for(iter = 0; iter < 4'b1111; i = i + 1) begin
+    for(iter = 0; iter < 4'b1111; iter = iter + 1) begin
         #10;
         data = iter;
     end
@@ -53,9 +53,9 @@ initial begin
     end
 
 initial begin
-    $display("Simulation start !")
+    $display("Simulation start !");
     $display($time,,, "LT = %d, RBI = %d, BI = %d, data = %d, display = ", LT, RBI, BI, data, display);
-    #500
+    #500;
     $finish; 
     end
 
