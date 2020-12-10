@@ -38,7 +38,7 @@ module Keyboard(
 
     always@(posedge clk_div or posedge rst_n)
     begin
-	if (rst_n) current_state <= S0;
+        if (rst_n) current_state <= S0;
         else current_state <= next_state;
     end
 
