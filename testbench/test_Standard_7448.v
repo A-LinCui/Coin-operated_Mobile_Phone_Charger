@@ -1,7 +1,7 @@
 // Testbench for Standard 7448
 // Author: Junbo Zhao <zhaojb17@mails.tsinghua.edu.cn>.
 
-`timescale 1ns / 1ps
+`timescale 10ns / 1ns
 module standard_7448_tb();
 
 
@@ -24,10 +24,10 @@ Standard_7448 sd_7448(
 
 
 initial begin
-    LT = 0;
-    RBI = 0;
-    BI = 0;
-    data = 4'b0000;
+    LT <= 0;
+    RBI <= 0;
+    BI <= 0;
+    data <= 4'b0000;
 
     // Stage 1: Test the basic function by display from zero to fifteen.
     for(iter = 0; iter < 4'b1111; iter = iter + 1) begin
@@ -52,11 +52,12 @@ initial begin
     data = 4'b0010;
     end
 
+
 initial begin
     $display("Simulation start !");
-    $display($time,,, "LT = %d, RBI = %d, BI = %d, data = %d, display = ", LT, RBI, BI, data, display);
+    $monitor($time,,, "LT = %d, RBI = %d, BI = %d, data = %d, display = ", LT, RBI, BI, data, display[6], display[5], display[4], display[3], display[2], display[1], display[0]);
     #500;
-    $finish; 
+    // $finish; 
     end
 
 endmodule
