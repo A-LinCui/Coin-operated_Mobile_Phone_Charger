@@ -35,8 +35,9 @@ module Amount_Manager(
     */ 
 
     reg [1:0] current_state, next_state; //Record current state and the following state
-    reg clk_div, timechange; 
+    reg clk_div; 
     reg [24:0]cnt;
+    wire change_time = (remaining_time != 2 * all_money) & (current_state != S3);
 
     parameter NUM_DIV = 50000000; //50MHz to 1Hz
     parameter S0 = 2'b00, S1 = 2'b01, S2 = 2'b10, S3 = 2'b11;
@@ -85,26 +86,19 @@ module Amount_Manager(
             S0: begin
                 timing <= 0;
                 all_money <= 0;
-		        timechange <= 0;
                 end
-            S1: begin
-                all_money[3:0] <= key_value;
-		        timechange <= 1;
-                end
-            S2: begin
-		        timechange = 0;
-                if (10 * key_value > MAX - all_money) all_money = MAX;
-                else all_money = all_money + 10 * key_value;
-                timechange = 1;
-                end
+            S1: all_money[3:0] <= key_value;
+            S2: 
+                if (key_value > MAX - 10 * all_money) all_money <= MAX;
+                else all_money <= 10 * all_money + key_value;
             S3: timing <= (remaining_time == 0)? 0:1;
         endcase
     end
 
-    always@(posedge clk_div or posedge timechange)
+    always@(posedge clk_div or posedge change_time)
     begin
-	    if(timechange) remaining_time <= 2 * all_money;   
+        if(change_time) remaining_time <= 2 * all_money;
         else if(current_state == S3) remaining_time <= remaining_time - 1;
     end
-	
+
 endmodule
