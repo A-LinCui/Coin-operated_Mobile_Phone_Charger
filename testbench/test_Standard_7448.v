@@ -57,7 +57,6 @@ initial begin
     $display("Simulation start !");
     $monitor($time,,, "LT = %d, RBI = %d, BI = %d, data = %d, display = ", LT, RBI, BI, data, display[6], display[5], display[4], display[3], display[2], display[1], display[0]);
     #500;
-    // $finish; 
     end
 
 endmodule
