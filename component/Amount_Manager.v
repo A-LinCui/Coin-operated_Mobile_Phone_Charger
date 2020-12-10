@@ -37,11 +37,12 @@ module Amount_Manager(
     reg [1:0] current_state, next_state; //Record current state and the following state
     reg clk_div; 
     reg [24:0]cnt;
-    wire change_time = (remaining_time != 2 * all_money) & (current_state != S3);
 
     parameter NUM_DIV = 50000000; //50MHz to 1Hz
     parameter S0 = 2'b00, S1 = 2'b01, S2 = 2'b10, S3 = 2'b11;
     parameter MAX = 20;
+
+    wire change_time = (remaining_time != 2 * all_money) & (current_state != S3);
 
     // Divide the clock signal from 50MHz to 1Hz
     always@(posedge clk)
