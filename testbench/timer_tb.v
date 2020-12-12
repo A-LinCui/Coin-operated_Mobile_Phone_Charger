@@ -7,15 +7,13 @@ module timer_tb();
 reg clk;
 reg reset;
 reg start;
-wire [13:0] cnt;
 wire timing;
 
 Timer t_timer(
     .clk(clk),
     .reset(reset),
     .start(start),
-    .timing(timing),
-    .cnt(cnt)
+    .timing(timing)
     );
 
 //Generate 1000Hz clock signal
@@ -47,7 +45,7 @@ end
 //Main
 initial begin
     $display("Simulation start !");
-    $monitor($time,,, "reset = %d, start = %d, timing = %d, cnt = %d", reset, start, timing, cnt);
+    $monitor($time,,, "reset = %d, start = %d, timing = %d", reset, start, timing);
     #1000000;
 end
 

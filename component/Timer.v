@@ -5,11 +5,11 @@ module Timer(
     input clk, //1000Hz after reduction
     input reset, //Reset signal
     input start, //The signal to start timing
-    output timing, //The signal at the end of timing
-    output reg[13:0] cnt
+    output timing //The signal at the end of timing
     );
 
     parameter MAXTIME = 10000;
+    reg[13:0] cnt;
 
     assign timing = start & (cnt != MAXTIME);
 
