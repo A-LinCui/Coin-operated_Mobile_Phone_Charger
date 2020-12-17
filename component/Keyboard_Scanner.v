@@ -1,7 +1,7 @@
 // Keyboard
 // Author: Junbo Zhao <zhaojb17@mails.tsinghua.edu.cn>.
 
-module Keyboard(
+module KeyboardScanner(
     input clk, //1000Hz after reduction
     input rst_n, //The signal to reset the FSM
     input [3:0]row, //x-axis
