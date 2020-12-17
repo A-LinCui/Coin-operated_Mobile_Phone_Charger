@@ -1,5 +1,6 @@
 // Testbench for Timer
 // Author: Junbo Zhao <zhaojb17@mails.tsinghua.edu.cn>.
+// State: Finished
 
 `timescale 100us / 100ns
 module timer_tb();
