@@ -1,5 +1,6 @@
 // Timer
 // Author: Junbo Zhao <zhaojb17@mails.tsinghua.edu.cn>.
+// State: Finished
 
 module Timer(
     input clk, //1000Hz after reduction
