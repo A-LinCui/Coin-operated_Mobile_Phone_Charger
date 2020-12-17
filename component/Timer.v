@@ -18,6 +18,6 @@ module Timer(
     begin
         if(reset) cnt <= 0;
         else cnt <= start? (cnt + 1):0;
-	end
+    end
     
 endmodule
