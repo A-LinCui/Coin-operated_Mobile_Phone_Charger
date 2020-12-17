@@ -2,7 +2,7 @@
 // Author: Junbo Zhao <zhaojb17@mails.tsinghua.edu.cn>.
 
 module Keyboard(
-    input clk,
+    input clk, //1000Hz after reduction
     input rst_n, //The signal to reset the FSM
     input [3:0]row, //x-axis
     output reg [3:0]col, //y-axis
@@ -14,35 +14,19 @@ module Keyboard(
     );
 
     reg [2:0] current_state, next_state; //Record current state and the following state
-    reg [15:0]cnt;
-    reg clk_div;
+    reg [5:0] cnt;
+    reg end_timing, _break;
 
-    parameter NUM_DIV = 20000; //50MHz to 2500Hz
+    parameter MAX = 4'b1111; //Stabilization. Valid if no change in 15 ms
     parameter S0 = 3'b000, S1 = 3'b001, S2 = 3'b010, S3 = 3'b011, S4=3'b100, S5=3'b101;
     parameter no_press = 4'b1111; //High voltage if not pressed
 
-    // Divide the clock signal from 50MHz to 2500Hz
-    always@(posedge clk)
+    always@(posedge clk or posedge rst_n)
     begin
-        if(cnt < NUM_DIV / 2 - 1)
-        begin
-            cnt <= cnt + 1'b1;
-            clk_div <= clk_div;
-        end
-        else 
-        begin
-            cnt <= 16'b0000000000000000;
-            clk_div <= ~clk_div;
-        end
+        current_state <= (rst_n)? S0:next_state;
     end
 
-    always@(posedge clk_div or posedge rst_n)
-    begin
-        if (rst_n) current_state <= S0;
-        else current_state <= next_state;
-    end
-
-    always@(current_state or key_value)
+    always@(current_state or end_timing or _break)
     begin
         case(current_state)
             S0: next_state <= (row == no_press)? S0:S1;
@@ -50,27 +34,42 @@ module Keyboard(
             S2: next_state <= (row == no_press)? S3:S5;
             S3: next_state <= (row == no_press)? S4:S5;
             S4: next_state <= (row == no_press)? S0:S5;
-            S5: next_state <= (row == no_press)? S0:S5;
+            S5: 
+                if (row == no_press) next_state <= S0;
+                else if (_break) next_state <= S0;
+                else if (end_timing) next_state <= S0;
+                else next_state <= S5;
         endcase
     end
 
-    always@(current_state)
+    always@(posedge clk)
+    begin
+        if (current_state != S5) begin
+            cnt <= 0;
+            _break <= 0;
+            end_timing <= 0;
+        end
+        else if(row == no_press) _break <= 1;
+        else if (cnt < MAX) cnt <= cnt + 1;
+        else if (cnt == MAX) end_timing <= 1;
+    end
+
+    always@(current_state or end_timing)
     begin
         case(current_state)
-            S0:begin
+            S0: begin
                 col <= 4'b0000;
                 press_num <= 0;
                 start <= 0;
                 clear <= 0;
                 confirm <= 0;
-            end
+                end
             S1: col <= 4'b0111;
             S2: col <= 4'b1011;
             S3: col <= 4'b1101;
             S4: col <= 4'b1110;
-            S5: 
-                if(row != no_press)
-                begin
+            S5:  
+                if(end_timing) begin
                     case({col, row})
                         8'b01110111: begin
                             key_value <= 4'b0001; //1
