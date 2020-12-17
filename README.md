@@ -1,4 +1,4 @@
-## Coin Operated Mobile Phone Charger
+## **Coin Operated Mobile Phone Charger**
 ### **Process**
 
 | Compoment | Timer | Amount Manager | Standard 7448 | CLK Divider | Keyboard | Controller |
