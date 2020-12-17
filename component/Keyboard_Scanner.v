@@ -1,7 +1,7 @@
 // Keyboard
 // Author: Junbo Zhao <zhaojb17@mails.tsinghua.edu.cn>.
 
-module KeyboardScanner(
+module Keyboard_Scanner(
     input clk, //1000Hz after reduction
     input rst_n, //The signal to reset the FSM
     input [3:0]row, //x-axis
@@ -26,7 +26,7 @@ module KeyboardScanner(
         current_state <= (rst_n)? S0:next_state;
     end
 
-    always@(current_state or end_timing or _break)
+    always@(current_state or _break)
     begin
         case(current_state)
             S0: next_state <= (row == no_press)? S0:S1;
@@ -37,7 +37,6 @@ module KeyboardScanner(
             S5: 
                 if (row == no_press) next_state <= S0;
                 else if (_break) next_state <= S0;
-                else if (end_timing) next_state <= S0;
                 else next_state <= S5;
         endcase
     end
