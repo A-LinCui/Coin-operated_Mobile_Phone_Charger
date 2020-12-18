@@ -7,9 +7,7 @@ module keyboardscanner_tb();
 reg clk, rst_n;
 reg[3:0] row;
 wire[3:0] col, key_value;
-wire press_num, start, clear, confirm;
-wire [2:0]current_state, next_state;
-wire [5:0] cnt;
+wire press;
 reg [1:0] exp;
 
 Keyboard_Scanner keyboard(
@@ -18,13 +16,7 @@ Keyboard_Scanner keyboard(
     .row(row),
     .col(col),
     .key_value(key_value),
-    .press_num(press_num),
-    .start(start),
-    .clear(clear),
-    .confirm(confirm),
-    .current_state(current_state),
-    .next_state(next_state),
-    .cnt(cnt)
+    .press(press)
     ); 
 
 
@@ -75,7 +67,7 @@ initial begin
     #300;
     
     
-    //Input clear
+    //Input confirm
     exp = 2'b11;
     row = 4'b1110;
     #500;
@@ -98,14 +90,14 @@ begin
         else row <= no_press; 
     end
     else if(exp == 2'b11) begin
-        if(col == 4'b1011) row <= 4'b1110;
+        if(col == 4'b1101) row <= 4'b1110;
         else row <= no_press; 
     end
 end
 
 initial begin
     $display("Simulation start !");
-    $monitor($time,,, "exp = %d, rst_n = %d, row = %d%d%d%d, col = %d%d%d%d, key_value = %d, press_num = %d, start = %d, clear = %d, confirm = %d, current state = %d, next_state = %d", exp, rst_n, row[3], row[2], row[1], row[0], col[3], col[2], col[1], col[0], key_value, press_num, start, clear, confirm, current_state, next_state);
+    $monitor($time,,, "exp = %d, rst_n = %d, row = %d%d%d%d, col = %d%d%d%d, key_value = %d, press = %d", exp, rst_n, row[3], row[2], row[1], row[0], col[3], col[2], col[1], col[0], key_value, press);
     #5000;
 end
 
