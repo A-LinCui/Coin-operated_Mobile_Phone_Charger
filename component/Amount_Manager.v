@@ -34,71 +34,60 @@ module Amount_Manager(
         State 11 (S3)
         Explanation: Timing.
         Function: Timing.
-    */ 
+    */
+
 
     reg [1:0] current_state, next_state; //Record current state and the following state
-    reg clk_div;
     reg [10:0]cnt;
 
     parameter NUM_DIV = 1000; //1000Hz to 1Hz
     parameter MAX = 5'b10100; //The maximum money
     parameter S0 = 2'b00, S1 = 2'b01, S2 = 2'b10, S3 = 2'b11;
 
-    wire change_time = (remaining_time != 2'b10 * all_money) & (current_state != S3); //While not timing, the remaining time should always be two times of money
-    assign timing = (current_state == S3) & (remaining_time!=0);
-
-    // Divide the clock signal from 1000Hz to 1Hz
-    always@(posedge clk)
-    begin
-        if (current_state != S3) begin
-            cnt <= 0;
-            clk_div <= 0;
-        end
-        else if(cnt < NUM_DIV / 2 - 1) cnt <= cnt + 1'b1;
-        else begin
-            cnt <= 0;
-            clk_div <= ~clk_div;
-	end
-    end
-    
-    // Reset
+    assign timing = (current_state == S3) & (remaining_time != 0);
+ 
     always@(posedge clk or posedge rst_n)
     begin
-        current_state <=(rst_n)? S0:next_state;
+        if(rst_n) current_state = S0;
+        else begin
+        current_state = next_state;
+        if(!timing) cnt <= 0;
+        else cnt <= (cnt == NUM_DIV)? 0:(cnt + 1);
+        end
     end
 
-    always@(rst_n, pressed or start or (~timing))
+    always@(posedge pressed or posedge start or negedge timing)
     begin
-        if(rst_n) all_money <= 0;  //Clear the registed money 
         case(current_state)
-            S0: begin
-                next_state <= (pressed)? S1:S0;
-                all_money <= (pressed)? key_value:0;
-                end
-            S1: 
-                if(start) next_state <= S3;
-                else if(pressed) begin
-                    if ({1'b0, key_value} > MAX - 5'b01010 * all_money) all_money <= MAX;
-                    else all_money <= 5'b01010 * all_money + key_value;
-                    next_state <= S2;
-                end
-            S2:
-                if(start) next_state <= S3;
-            S3:
-                if(~timing) begin
-                    next_state <= S0;
-                    all_money <= 0;
-                end
+            S0: next_state <= (pressed)? S1:S0;
+            S1: if(start) next_state <= S3;
+                else if (pressed) next_state <= S2;
+            S2: if(start) next_state <= S3;
+            S3: if(!timing) next_state <= S0;
         endcase
     end
 
-    // Change the remaining time when the money changes. 
-    // Else, change the remaining time when timing.
-    always@(posedge clk_div or posedge change_time or posedge rst_n)
+    always@(current_state or rst_n or cnt)
     begin
-        if(rst_n) remaining_time <= 0;
-        else if(change_time) remaining_time <= 2'b10 * all_money;
-        else if(current_state == S3) remaining_time <= remaining_time - 1;
+        if(rst_n) begin
+            remaining_time = 0;
+            all_money = 0;
+        end
+        case(current_state)
+            S0: begin
+                remaining_time = 0;
+                all_money = 0;
+                end
+            S1: begin
+                all_money = {1'b0, key_value};
+                remaining_time = 2'b10 * all_money;
+                end
+            S2: begin
+                if (all_money > 5'b00010) all_money = MAX;
+                else all_money = 5'b01010 * all_money + {1'b0, key_value};
+                remaining_time = 2'b10 * all_money;
+                end 
+            S3: if(cnt == NUM_DIV) remaining_time = remaining_time - 1;
+            endcase
     end
-
 endmodule
