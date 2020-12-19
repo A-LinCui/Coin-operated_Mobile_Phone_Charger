@@ -51,8 +51,8 @@ module Keyboard_Scanner(
         case(current_state)
             S0: begin
                 col = 4'b0000;
-					 press = 0;
-					 key_value = 4'b0000;
+		press = 0;
+		key_value = 4'b0000;
                 end
             S1: col = 4'b0111;
             S2: col = 4'b1011;
@@ -74,7 +74,7 @@ module Keyboard_Scanner(
                         8'b10111110: key_value = 4'b1011; //11, clear;
                         8'b11011110: key_value = 4'b1100; //12, confirm;
                     endcase
-						  press = 1;
+		    press = 1;
                 end
         endcase
     end
