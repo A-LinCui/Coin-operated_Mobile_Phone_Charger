@@ -45,40 +45,37 @@ module Keyboard_Scanner(
     always@(current_state or cnt or rst_n) begin
         if (rst_n) begin
             col = 4'b0000;
-            press <= 0;
-            key_value <= 4'b0000;
+            press = 0;
+            key_value = 4'b0000;
         end
         case(current_state)
             S0: begin
                 col = 4'b0000;
-                press <= 0;
-                key_value <= 4'b0000;
+					 press = 0;
+					 key_value = 4'b0000;
                 end
             S1: col = 4'b0111;
             S2: col = 4'b1011;
             S3: col = 4'b1101;
             S4: col = 4'b1110;
-            S5: begin
-                col = col;
-                if(cnt == MAX) begin
-                    press <= 1;
+            S5: if(cnt == MAX) begin
                     case({col, row})
-                        8'b01110111: key_value <= 4'b0001; //1
-                        8'b10110111: key_value <= 4'b0010; //2
-                        8'b11010111: key_value <= 4'b0011; //3
-                        8'b11100111: key_value <= 4'b0100; //4
-                        8'b01111011: key_value <= 4'b0101; //5
-                        8'b10111011: key_value <= 4'b0110; //6
-                        8'b11011011: key_value <= 4'b0111; //7
-                        8'b11101011: key_value <= 4'b1000; //8
-                        8'b01111101: key_value <= 4'b1001; //9
-                        8'b10111101: key_value <= 4'b0000; //0
-                        8'b01111110: key_value <= 4'b1010; //10, start;
-                        8'b10111110: key_value <= 4'b1011; //11, clear;
-                        8'b11011110: key_value <= 4'b1100; //12, confirm;
+                        8'b01110111: key_value = 4'b0001; //1
+                        8'b10110111: key_value = 4'b0010; //2
+                        8'b11010111: key_value = 4'b0011; //3
+                        8'b11100111: key_value = 4'b0100; //4
+                        8'b01111011: key_value = 4'b0101; //5
+                        8'b10111011: key_value = 4'b0110; //6
+                        8'b11011011: key_value = 4'b0111; //7
+                        8'b11101011: key_value = 4'b1000; //8
+                        8'b01111101: key_value = 4'b1001; //9
+                        8'b10111101: key_value = 4'b0000; //0
+                        8'b01111110: key_value = 4'b1010; //10, start;
+                        8'b10111110: key_value = 4'b1011; //11, clear;
+                        8'b11011110: key_value = 4'b1100; //12, confirm;
                     endcase
+						  press = 1;
                 end
-            end
         endcase
     end
 endmodule
