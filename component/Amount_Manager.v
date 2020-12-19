@@ -13,9 +13,9 @@ module Amount_Manager(
     input start, //The signal that starts timing
     input pressed, //The signal that a number key is pressed
     input [3:0]key_value, //Value of the pressed key (0-9)
+    output timing, //The signal that is timing
     output reg [4:0]all_money, //The money, binary
-    output reg [5:0]remaining_time, //The remained time, binary
-    output timing //The signal that is timing 
+    output reg [5:0]remaining_time //The remained time, binary
     );
 
     /* States of The Amount Manager.
@@ -26,11 +26,9 @@ module Amount_Manager(
         State 01 (S1)
         Explanation: One input is given.
         Function: Ready to start timing and to receive the next input number. 
-
         State 10 (S2)
         Explanation: Two inputs are given.
         Function: Ready to start timing.
-
         State 11 (S3)
         Explanation: Timing.
         Function: Timing.
@@ -48,31 +46,29 @@ module Amount_Manager(
  
     always@(posedge clk or posedge rst_n)
     begin
-        if(rst_n) current_state = S0;
+        if(rst_n) current_state <= S0;
         else begin
-        current_state = next_state;
+        current_state <= next_state;
         if(!timing) cnt <= 0;
         else cnt <= (cnt == NUM_DIV)? 0:(cnt + 1);
         end
     end
 
-    always@(posedge pressed or posedge start or negedge timing)
+    always@(posedge rst_n or posedge pressed or posedge start or negedge timing)
     begin
+        if(rst_n) next_state <= S0;
         case(current_state)
-            S0: next_state <= (pressed)? S1:S0;
+            S0: if(pressed) next_state <= S1;
             S1: if(start) next_state <= S3;
                 else if (pressed) next_state <= S2;
+                else next_state <= S1;
             S2: if(start) next_state <= S3;
             S3: if(!timing) next_state <= S0;
         endcase
     end
 
-    always@(current_state or rst_n or cnt)
+    always@(current_state or cnt)
     begin
-        if(rst_n) begin
-            remaining_time = 0;
-            all_money = 0;
-        end
         case(current_state)
             S0: begin
                 remaining_time = 0;
@@ -88,6 +84,6 @@ module Amount_Manager(
                 remaining_time = 2'b10 * all_money;
                 end 
             S3: if(cnt == NUM_DIV) remaining_time = remaining_time - 1;
-            endcase
+        endcase
     end
 endmodule
