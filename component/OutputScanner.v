@@ -1,6 +1,6 @@
 // Ouput Scanner
 // Author: Junbo Zhao <zhaojb17@mails.tsinghua.edu.cn>.
-// Function: Scan the digital tube for digital output.
+// Function: Scan the digital tubes for digital output.
 // State: Finished.
 
 module OutputScanner(
