@@ -51,8 +51,8 @@ module Keyboard_Scanner(
         case(current_state)
             S0: begin
                 col = 4'b0000;
-		press = 0;
-		key_value = 4'b0000;
+		        press = 0;
+		        key_value = 4'b0000;
                 end
             S1: col = 4'b0111;
             S2: col = 4'b1011;
@@ -60,21 +60,59 @@ module Keyboard_Scanner(
             S4: col = 4'b1110;
             S5: if(cnt == MAX) begin
                     case({col, row})
-                        8'b01110111: key_value = 4'b0001; //1
-                        8'b10110111: key_value = 4'b0010; //2
-                        8'b11010111: key_value = 4'b0011; //3
-                        8'b11100111: key_value = 4'b0100; //4
-                        8'b01111011: key_value = 4'b0101; //5
-                        8'b10111011: key_value = 4'b0110; //6
-                        8'b11011011: key_value = 4'b0111; //7
-                        8'b11101011: key_value = 4'b1000; //8
-                        8'b01111101: key_value = 4'b1001; //9
-                        8'b10111101: key_value = 4'b0000; //0
-                        8'b01111110: key_value = 4'b1010; //10, start;
-                        8'b10111110: key_value = 4'b1011; //11, clear;
-                        8'b11011110: key_value = 4'b1100; //12, confirm;
+                        8'b01110111: begin
+                            key_value = 4'b0001; //1
+                            press = 1;
+                            end
+                        8'b10110111: begin
+                            key_value = 4'b0010; //2
+                            press = 1;
+                            end
+                        8'b11010111: begin
+                            key_value = 4'b0011; //3
+                            press = 1;
+                            end
+                        8'b11100111: begin
+                            key_value = 4'b0100; //4
+                            press = 1;
+                            end
+                        8'b01111011: begin
+                            key_value = 4'b0101; //5
+                            press = 1;
+                            end
+                        8'b10111011: begin
+                            key_value = 4'b0110; //6
+                            press = 1;
+                            end
+                        8'b11011011: begin
+                            key_value = 4'b0111; //7
+                            press = 1;
+                            end
+                        8'b11101011: begin
+                            key_value = 4'b1000; //8
+                            press = 1;
+                            end
+                        8'b01111101: begin
+                            key_value = 4'b1001; //9
+                            press = 1;
+                            end
+                        8'b10111101: begin
+                            key_value = 4'b0000; //0
+                            press = 1;
+                            end
+                        8'b01111110: begin
+                            key_value = 4'b1010; //10, start;
+                            press = 1;
+                            end
+                        8'b10111110: begin
+                            key_value = 4'b1011; //11, clear;
+                            press = 1;
+                            end
+                        8'b11011110: begin
+                            key_value = 4'b1100; //12, confirm;
+                            press = 1;
+                            end
                     endcase
-		    press = 1;
                 end
         endcase
     end
