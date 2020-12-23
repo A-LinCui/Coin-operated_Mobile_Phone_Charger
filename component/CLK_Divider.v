@@ -1,9 +1,7 @@
 // Clock Divider
 // Author: Junbo Zhao <zhaojb17@mails.tsinghua.edu.cn>.
+// Function: Reduce the frequency from 50MHz to 1000Hz. The output signal serves as the global clock.
 // State: Finshed
-
-// Reduce the frequency from 50MHz to 1000Hz.
-// The output signal serves as the global clock.
 
 module CLK_Divider(
     input clk,
