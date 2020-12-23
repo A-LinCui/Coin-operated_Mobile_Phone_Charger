@@ -42,6 +42,6 @@ module InputProcessor(
             confirm <= 0;
             press_num <= 0;
         end
-	end
+    end
     
 endmodule
