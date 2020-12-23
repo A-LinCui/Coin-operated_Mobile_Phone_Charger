@@ -1,5 +1,7 @@
 // StateDisplayer
+// Function: Display the state of the controller to luminous diodes.
 // Author: Junbo Zhao <zhaojb17@mails.tsinghua.edu.cn>.
+// State: Finished.
 
 module StateDisplayer(
     input clk,
