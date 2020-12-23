@@ -1,125 +1,107 @@
-// Charger Controller (Finite-State Machine)
+// Charge Controller
 // Author: Junbo Zhao <zhaojb17@mails.tsinghua.edu.cn>.
+// Function: Controll the current state.
+// State: Finshed. Passed all test.
 
 module ChargeController(
     input clk,
     input rst_n, //Initial reset signal
     input [3:0]key_value, //Input from the keyboard scanner
     input press,
-    output reg no_display, //The signal to extinguish the digital tubes
-    output timing, //The siginal that is charging
-    output reg [4:0]all_money, //The money, binary
-    output reg [5:0]remaining_time, //The remained time, binary
-    output reg [2:0]current_state,
-    output reg [2:0]next_state
-	);
+    input clear,
+    input start,
+    input confirm,
+    output reg no_display = 0, //The signal to extinguish the digital tubes
+    output reg [4:0]all_money, //The money (binary)
+    output reg [5:0]remaining_time, //The remained time (binary)
+    output reg [2:0]current_state = 0 //Current state of the controller
+    );
 
-	/* States of The Controller.
-        State 000
-        Explanation: Initial State. 
-        Function: No digial tubes display.
-        
-        State 001
-        Explanation: Start State.
-        Function: Ready to pay. And digital tubes display '0000'.
-
-        State 010
-        Explanation: Input State I.
-        Function: The first number of payment is given.
-
-        State 011
-        Explanation: Input State II.
-        Function: The second number of payment is given.
-
-        State 100
-        Explanation: Charging State.
-        Function: Charging.
-    */ 
-
-	// reg [2:0] current_state, next_state; //Record current state and the following state
-	
     parameter S0 = 3'b000, S1 = 3'b001, S2 = 3'b010, S3 = 3'b011, S4 = 3'b100;
-    parameter clear = 4'b1011, start = 4'b1010, confirm = 4'b1100;
-    parameter MAX = 5'b10100; //The maximum money
-    parameter max_waiting = 10000; //1000Hz to 10 seconds
+    parameter MAX = 5'b10100; //The maximum money(20)
+    parameter NUM_DIV = 1000; //Reduce the frequency from 1000Hz to 1Hz
 
-    //10-second-counting for S1
-    reg [13:0] waiting_time;
+    reg [3:0] inactive_time = 0; //Ten-second countdown
+    reg press_prev = 0, start_prev = 0, clear_prev = 0, confirm_prev = 0;
 
-    always@(posedge clk)  //10-second-counting for S1
-    begin
-        if(current_state != S1) waiting_time <= 0;
-        else if(waiting_time < max_waiting) waiting_time <= waiting_time + 1; 
-    end
-
-
-    //Remaining time reduction 
-    reg [10:0]cnt;
-    parameter NUM_DIV = 1000; //1000Hz to 1Hz
-
-    always@(posedge clk) //1000Hz to 1Hz to reduce remaining time
-    begin
-        if(current_state != S4) cnt <= 0;
-        else cnt <= (cnt == NUM_DIV)? 0:cnt + 1;
-    end
-
-
-    assign timing = (current_state == S4) & (remaining_time != 0);
+    reg clk_div, clk_div_prev = 0;
+    reg [10:0]cnt; //Remaining time reduction
+    reg [2:0] next_state = 0;
     
-	
+    //Reduce the frequency from 1000Hz to 1Hz 
+    always@(posedge clk)
+	begin    
+        if(cnt == (NUM_DIV / 2)) begin
+            cnt <= 0;
+            clk_div <= ~clk_div;
+        end
+        else cnt <= cnt + 1;
+    end
+
     always@(posedge clk or posedge rst_n)
     begin
-        if (rst_n) current_state <= S0;
-        else current_state <= next_state;
-	end
-
-	
-    always@(press or timing or rst_n or waiting_time)
-	begin
-        next_state = next_state;
-        if(rst_n) next_state = S0;
-        case(current_state)
-            S0: next_state = (press & (key_value == start))? S1:S0;
-            S1: if(waiting_time == max_waiting) next_state = S0; 
-                else if (press & (key_value < 4'b1010)) next_state = S2;
-            S2: if(press & (key_value < 4'b1010)) next_state = S3;
-                else if(key_value == clear) next_state = S1;
-                else if(key_value == confirm) next_state = S4;
-            S3: if(key_value == confirm) next_state = S4;
-                else if(key_value == clear) next_state = S1;
-            S4: next_state = (timing)? S1:S4;
-        endcase
+        if(rst_n) current_state <= S0;
+        else current_state <= next_state;    
     end
-    
-    
-    always@(current_state or rst_n or cnt)
+
+    always@(posedge clk)
     begin
-        if (rst_n) begin
-            all_money = 0;
-            remaining_time = 0;
-        end
         case(current_state)
             S0: begin
+                if(rst_n) next_state = S0;
                 no_display = 1;
-                all_money = 0;
                 remaining_time = 0;
+                all_money = 0;
+                inactive_time = 0;
+                if (start && !start_prev) next_state = S1;
                 end
             S1: begin
-                all_money = 0;
-                remaining_time = 0;
                 no_display = 0;
+                if(press && !press_prev) begin
+                    next_state = S2;
+                    all_money = key_value;
+		    remaining_time = {all_money, 1'b0};
                 end
-            S2: begin
-                all_money = {1'b0, key_value};
-                remaining_time = 2'b10 * all_money;
+                if((clear && !clear_prev) || (confirm && !confirm_prev) || (start && !start_prev)) inactive_time = 0;
+                if (clk_div && !clk_div_prev) begin
+                    inactive_time = inactive_time + 1;
+                    if(inactive_time == 10) next_state = S0;
                 end
-            S3: begin
-                if (all_money > 5'b00010) all_money = MAX;
-                else all_money = 5'b01010 * all_money + {1'b0, key_value};
-                remaining_time = 2'b10 * all_money;
                 end
-            S4: if((cnt == NUM_DIV) & (remaining_time != 0)) remaining_time = remaining_time - 1;
+            S2: if(press && !press_prev) begin
+                    next_state <= S3;
+                    if (all_money < 2) all_money = 10 * all_money + key_value;
+                    else all_money = MAX;
+		    remaining_time = {all_money, 1'b0};
+                end
+                else if (clear && !clear_prev) begin
+                    inactive_time = 0;
+                    all_money = 0;
+                    remaining_time = 0;
+                    next_state <= S1;
+                end
+                else if (confirm && !confirm_prev) next_state <= S4;
+            S3: if (clear && !clear_prev) begin
+                    inactive_time = 0;
+                    all_money = 0;
+                    remaining_time = 0;
+                    next_state <= S1;
+                end
+                else if (confirm && !confirm_prev) next_state <= S4;
+            S4: if (clk_div && !clk_div_prev) begin
+                    remaining_time = remaining_time - 1;
+                    if (remaining_time == 0) begin
+                        all_money = 0;
+                        inactive_time = 0;
+                        next_state <= S1;
+                    end
+                end
         endcase
+        clk_div_prev = clk_div;
+        clear_prev = clear;
+        confirm_prev = confirm;
+        start_prev = start;
+        press_prev = press;
     end
-
+	
 endmodule
