@@ -1,5 +1,7 @@
 // Amount Translator
 // Author: Junbo Zhao <zhaojb17@mails.tsinghua.edu.cn>.
+// Function: Convert the amount of money and time inside the controller into a form that the digital tube can output.
+// State: Finished
 
 module AmountTranslator(
     input [4:0] all_money,
@@ -13,7 +15,7 @@ module AmountTranslator(
     always @ * begin
         money_1 = all_money / 10;
         money_2 = all_money % 10;
-	    time_1 = remaining_time / 10;
+	time_1 = remaining_time / 10;
         time_2 = remaining_time % 10;
     end
 
