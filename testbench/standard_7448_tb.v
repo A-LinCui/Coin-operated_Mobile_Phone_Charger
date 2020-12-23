@@ -1,5 +1,6 @@
 // Testbench for Standard 7448
 // Author: Junbo Zhao <zhaojb17@mails.tsinghua.edu.cn>.
+// State: Finished. The Standard 7448 has passed all the test.
 
 `timescale 10ns / 1ns
 module standard_7448_tb();
