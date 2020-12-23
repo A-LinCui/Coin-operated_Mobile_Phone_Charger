@@ -1,5 +1,7 @@
 // Standard 7448
 // Author: Junbo Zhao <zhaojb17@mails.tsinghua.edu.cn>.
+// Function: Standard 7448.
+// State: Finished
 
 /*
     Although not used in this project
