@@ -1,5 +1,6 @@
 // Keyboard Scanner
 // Author: Junbo Zhao <zhaojb17@mails.tsinghua.edu.cn>.
+// Function: Scan the keyboard circuit and receive the value of the pressed key.
 // State: Finished. Passed all test.
 
 module Keyboard_Scanner(
