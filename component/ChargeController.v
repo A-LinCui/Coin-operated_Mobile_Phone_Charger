@@ -1,7 +1,7 @@
 // Charge Controller
 // Author: Junbo Zhao <zhaojb17@mails.tsinghua.edu.cn>.
 // Function: Controll the current state.
-// State: Finshed
+// State: Finshed. Passed all test.
 
 module ChargeController(
     input clk,
@@ -26,6 +26,7 @@ module ChargeController(
 
     reg clk_div, clk_div_prev = 0;
     reg [10:0]cnt; //Remaining time reduction
+    reg [2:0] next_state = 0;
     
     //Reduce the frequency from 1000Hz to 1Hz 
     always@(posedge clk)
@@ -37,77 +38,70 @@ module ChargeController(
         else cnt <= cnt + 1;
     end
 
+    always@(posedge clk or posedge rst_n)
+    begin
+        if(rst_n) current_state <= S0;
+        else current_state <= next_state;    
+    end
+
     always@(posedge clk)
     begin
-        if (rst_n) begin
-            current_state <= S0;
-            no_display <= 1;
-        end
-        if(current_state == S0) no_display <= 1; //When first power on, extinguish the digital tubes
-        if (clk_div && !clk_div_prev) begin
-            if (current_state == S4) begin
-                remaining_time = remaining_time - 1;
-                if (remaining_time == 0) begin
-                    current_state <= S1;
+        case(current_state)
+            S0: begin
+                if(rst_n) next_state = S0;
+                no_display = 1;
+                remaining_time = 0;
+                all_money = 0;
+                inactive_time = 0;
+                if (start && !start_prev) next_state = S1;
+                end
+            S1: begin
+                no_display = 0;
+                if(press && !press_prev) begin
+                    next_state = S2;
+                    all_money = key_value;
+		    remaining_time = {all_money, 1'b0};
+                end
+                if((clear && !clear_prev) || (confirm && !confirm_prev) || (start && !start_prev)) inactive_time = 0;
+                if (clk_div && !clk_div_prev) begin
+                    inactive_time = inactive_time + 1;
+                    if(inactive_time == 10) next_state = S0;
+                end
+                end
+            S2: if(press && !press_prev) begin
+                    next_state <= S3;
+                    if (all_money < 2) all_money = 10 * all_money + key_value;
+                    else all_money = MAX;
+		    remaining_time = {all_money, 1'b0};
+                end
+                else if (clear && !clear_prev) begin
+                    inactive_time = 0;
                     all_money = 0;
                     remaining_time = 0;
+                    next_state <= S1;
                 end
-	    end 
-            else begin
-                inactive_time <= inactive_time + 1;
-                if (inactive_time == 10) begin
-                    no_display <= 1;
-                    current_state <= S0;
+                else if (confirm && !confirm_prev) next_state <= S4;
+            S3: if (clear && !clear_prev) begin
+                    inactive_time = 0;
                     all_money = 0;
                     remaining_time = 0;
+                    next_state <= S1;
                 end
-            end
-        end
-
-        if (start && !start_prev) begin
-            inactive_time <= 0;
-            if (current_state == S0) begin
-                current_state <= S1;
-                no_display <= 0;
-                all_money = 0;
-                remaining_time = 0;
-            end
-        end
-
-        if (clear && !clear_prev) begin
-            inactive_time <= 0;
-            if (current_state == S2 || current_state == S3) begin
-                current_state <= S1;
-                all_money = 0;
-                remaining_time = 0;
-            end
-        end
-
-        if (press && !press_prev) begin
-            inactive_time <= 0;
-            if (current_state == S1) begin
-                current_state <= S2;
-                all_money = key_value;
-		remaining_time = {all_money, 1'b0};
-            end
-            else if (current_state == S2) begin
-                current_state <= S3;
-                if (all_money < 2) all_money = 10 * all_money + key_value;
-                else all_money = MAX;
-		remaining_time = {all_money, 1'b0};
-            end
-        end
-
-        if (confirm && !confirm_prev) begin
-            inactive_time <= 0;
-            if (current_state == S2 || current_state == S3) current_state <= S4;
-        end
-
-        clk_div_prev <= clk_div;
-        clear_prev <= clear;
-        confirm_prev <= confirm;
-        start_prev <= start;
-        press_prev <= press;
+                else if (confirm && !confirm_prev) next_state <= S4;
+            S4: if (clk_div && !clk_div_prev) begin
+                    remaining_time = remaining_time - 1;
+                    if (remaining_time == 0) begin
+                        all_money = 0;
+                        inactive_time = 0;
+                        next_state <= S1;
+                    end
+                end
+        endcase
+        clk_div_prev = clk_div;
+        clear_prev = clear;
+        confirm_prev = confirm;
+        start_prev = start;
+        press_prev = press;
     end
 	
 endmodule
