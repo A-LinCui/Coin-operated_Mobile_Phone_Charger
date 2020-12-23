@@ -1,5 +1,6 @@
 // Testbench for Keyboard
 // Author: Junbo Zhao <zhaojb17@mails.tsinghua.edu.cn>.
+// State: Finished. The keyboard scanner has passed all the test.
 
 `timescale 100us / 100ns
 module keyboardscanner_tb();
@@ -43,55 +44,56 @@ initial begin
     #300;
     
 
-    //Input 4
+    //Experiment 1: Input 4.
     exp = 2'b00;
     row = 4'b0111;
     #1000;
     row = no_press;
     #300;
 
-    //Shake: Fake input 4
+    //Experiment 2: Simulate shaking. Fake input 4.
     exp = 2'b01;
     row = 4'b0111;
-    #100; //Fake shake for 10ms. 
-    // As we can see, although state of the scanner turns to S5, however, output nothing
+    #100; //Shaking for 10ms. 
+    // As we can see, although the state of the scanner turns to S5, however, output nothing.
     row = no_press;
-    #100;
-    
+    #300;
 
-    //Long-time input 2
+    //Experiment 3: Simulate long-time pressing. Input 2.
     exp = 2'b10;
     row = 4'b0111;
     #40000; //4s 
     row = no_press;
     #300;
     
-    
-    //Input confirm
+    //Experiment 3: Input 'confirm'.
     exp = 2'b11;
     row = 4'b1110;
     #500;
     row = no_press;
     #300;
+    
 end
 
+
+// Feedback control. The row values vary with the column values.
 always@(col)
 begin
     if(exp == 2'b00) begin
-        if(col == 4'b1110) row <= 4'b0111;
-        else row <= no_press;
+        if(col == 4'b1110) row = 4'b0111;
+        else row = no_press;
     end
     else if(exp == 2'b01) begin
-        if(col == 4'b1110) row <= 4'b0111;
-        else row <= no_press;
+        if(col == 4'b1110) row = 4'b0111;
+        else row = no_press;
     end
     else if(exp == 2'b10) begin
-        if(col == 4'b1011) row <= 4'b0111;
-        else row <= no_press; 
+        if(col == 4'b1011) row = 4'b0111;
+        else row = no_press; 
     end
     else if(exp == 2'b11) begin
-        if(col == 4'b1101) row <= 4'b1110;
-        else row <= no_press; 
+        if(col == 4'b1101) row = 4'b1110;
+        else row = no_press; 
     end
 end
 
