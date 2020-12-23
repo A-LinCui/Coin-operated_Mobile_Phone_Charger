@@ -1,5 +1,7 @@
-// Amount Translator
+// Ouput Scanner
 // Author: Junbo Zhao <zhaojb17@mails.tsinghua.edu.cn>.
+// Function: Scan the digital tube for digital output.
+// State: Finished.
 
 module OutputScanner(
     input clk, //1000Hz after reduction
