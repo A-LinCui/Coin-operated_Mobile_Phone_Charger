@@ -1,9 +1,7 @@
 // Input_Processor
 // Author: Junbo Zhao <zhaojb17@mails.tsinghua.edu.cn>.
-
-/*
-    Manage the input for keyboard scanner.
-*/
+// Function: Manage the input for keyboard scanner.
+// State: Finished.
 
 module InputProcessor(
     input pressed,
