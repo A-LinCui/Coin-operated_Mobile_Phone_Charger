@@ -66,7 +66,7 @@ initial begin
     row = no_press;
     #300;
     
-    //Experiment 3: Input 'confirm'.
+    //Experiment 4: Input 'confirm'.
     exp = 2'b11;
     row = 4'b1110;
     #500;
